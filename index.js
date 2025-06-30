@@ -1,7 +1,9 @@
 const express = require('express');
 const port=process.env.PORT || 5000
 const app=express()
+const { v4: uuidv4 } = require('uuid');
 
+const pool=require("./db")
 
 app.use(express.json())
 
@@ -17,8 +19,11 @@ app.get("/products",async(req,res)=>{
 app.post("/products",async(req,res)=>{
     try {
        const {name, price}=req.body
+       const id=uuidv4();
 
-        res.status(200).send({message:`the product name ${name} and ${price}`})
+       const result=await pool.query("INSERT INTO product(id,name,price) VALUES($1,$2,$3) RETURNING*",[id,name,price])
+
+        res.status(200).send({message:`the product name ${name} and ${price}`,product:result.rows})
     } catch (error) {
      res.send({ error: "error.message" });  
     }
@@ -28,8 +33,8 @@ app.post("/products",async(req,res)=>{
 app.get("/products/:id",async(req,res)=>{
     try {
         const id=req.params.id
-
-        res.status(200).send({message:`the product id ${id}`})
+       const result=await pool.query("select* from product where id=$1",[id])
+        res.status(200).send({message:`the product id ${id}`,product:result.rows})
     } catch (error) {
       res.send({ error: "error.message" }); 
     }

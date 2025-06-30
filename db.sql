@@ -1,0 +1,7 @@
+CREATE TABLE product (
+  id VARCHAR(255) PRIMARY KEY NOT NULL,
+  name VARCHAR(50),
+  price NUMERIC(10, 3)
+);
+
+
